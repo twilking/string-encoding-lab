@@ -9,10 +9,13 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -22,7 +25,10 @@ public class Main {
 
     private static Path file;
 
+    //Here you can define the encoding
     private static final String CHARSET_ENCODING = StandardCharsets.UTF_16.name();
+
+    public static String WORKING_FOLDER = System.getProperty("user.home") + "\\StringExp\\";
 
     // UTF-16 Encoding / BigIndian BOM FE FF / LittleIndian BOM FF FE
     // 𤽜 = D8 53 DF 5C (Surrogates)
@@ -31,18 +37,25 @@ public class Main {
     // 字 = 5B 57
     // UNICODE Tabelle  : http://www.tamasoft.co.jp/en/general-info/unicode.html
     // UTF Converter    : http://macchiato.com/unicode/convert.html
-    //String with surogates
+    //String with surogates in UTF 16 encoding
     private static final String string = "𤽜中文字𤽜";
 
-    //String without surogate
+    //String without surogate im UTF 16 encoding
     //static String string = "中文字";
     /**
-     * Reverses the string in different abstractions like bytes, chars and
+     * Reverses the string with different abstractions like bytes, chars and
      * StringBuilder.
      */
     public static void main(String[] args) throws UnsupportedEncodingException, IOException {
 
-        file = Paths.get("C:\\temp\\StringExp\\string_orignal.txt");
+        try {
+            Files.createDirectory(Paths.get(WORKING_FOLDER));
+            Logger.getGlobal().log(Level.INFO, String.format("Folder %s created", WORKING_FOLDER));
+        } catch (FileAlreadyExistsException e) {
+            Logger.getGlobal().log(Level.INFO, String.format("Folder %s already exists", WORKING_FOLDER));
+        }
+
+        file = Paths.get(WORKING_FOLDER + "string_orignal.txt");
         Files.write(file, string.getBytes(CHARSET_ENCODING), StandardOpenOption.CREATE);
 
         //StringBuilder+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -51,7 +64,7 @@ public class Main {
 
         byte[] stringBuilderbytes = stringBuilder.toString().getBytes(CHARSET_ENCODING);
 
-        file = Paths.get("C:\\temp\\StringExp\\stringBuilder_reverse.txt");
+        file = Paths.get(WORKING_FOLDER + "stringBuilder_reverse.txt");
         Files.write(file, stringBuilderbytes, StandardOpenOption.CREATE);
 
         //StringReader+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -69,7 +82,7 @@ public class Main {
 
         }
 
-        file = Paths.get("C:\\temp\\StringExp\\stringReader_original.txt");
+        file = Paths.get(WORKING_FOLDER + "stringReader_original.txt");
         Files.write(file, new String(readedChars).getBytes(CHARSET_ENCODING), StandardOpenOption.CREATE);
 
         //Bytes+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -82,7 +95,7 @@ public class Main {
             j++;
         }
 
-        file = Paths.get("C:\\temp\\StringExp\\pureBytes_reverse.txt");
+        file = Paths.get(WORKING_FOLDER + "pureBytes_reverse.txt");
         Files.write(file, reverseByte, StandardOpenOption.CREATE);
 
         //Char++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -95,7 +108,7 @@ public class Main {
             jj++;
         }
 
-        file = Paths.get("C:\\temp\\StringExp\\chars_reverse.txt");
+        file = Paths.get(WORKING_FOLDER + "chars_reverse.txt");
         Files.write(file, String.valueOf(reversChars).getBytes(CHARSET_ENCODING), StandardOpenOption.CREATE);
 
     }
